@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Search, MapPin, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -7,6 +8,7 @@ import LocationMap from "./LocationMap";
 import { toast } from "sonner";
 
 export default function SearchSection() {
+  const navigate = useNavigate();
   const [selectedDate, setSelectedDate] = useState<Date | undefined>();
   const [selectedLocation, setSelectedLocation] = useState<{ lat: number; lng: number } | null>(null);
 
@@ -16,7 +18,12 @@ export default function SearchSection() {
       return;
     }
     
-    toast.success(`Busca realizada!\nData: ${selectedDate.toLocaleDateString('pt-BR')}\nLocalização: ${selectedLocation.lat.toFixed(4)}, ${selectedLocation.lng.toFixed(4)}`);
+    navigate("/results", { 
+      state: { 
+        date: selectedDate, 
+        locationData: selectedLocation 
+      } 
+    });
   };
 
   return (

@@ -1,5 +1,6 @@
 import { Bot } from "lucide-react";
 import SearchSection from "@/components/SearchSection";
+import ChatBot from "@/components/ChatBot";
 
 const Index = () => {
   return (
@@ -47,6 +48,9 @@ const Index = () => {
           <p>© 2025 Dines de Jumps. Todos os direitos reservados.</p>
         </div>
       </footer>
+
+      {/* ChatBot */}
+      <ChatBot />
     </div>
   );
 };
