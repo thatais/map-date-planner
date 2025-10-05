@@ -1,10 +1,12 @@
 import { Bot } from "lucide-react";
 import SearchSection from "@/components/SearchSection";
 import ChatBot from "@/components/ChatBot";
+// import ChatBot from "@/components/ChatBot";
 
 const Index = () => {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-secondary">
+    <div className="min-h-screen bg-gradient-to-b from-blue-900 via-blue-800 to-blue-700">
+      <div className="relative z-10">
       {/* Header */}
       <header className="w-full bg-card shadow-md border-b">
         <div className="max-w-7xl mx-auto px-4 py-6">
@@ -15,7 +17,7 @@ const Index = () => {
               </div>
               <div>
                 <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                  Dines de Jumps
+                  TemporALL
                 </h1>
                 <p className="text-sm text-muted-foreground">Encontre seu local ideal</p>
               </div>
@@ -30,28 +32,35 @@ const Index = () => {
       </header>
 
       {/* Hero Section */}
-      <section className="w-full max-w-7xl mx-auto px-4 py-12 text-center">
-        <h2 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent animate-in fade-in slide-in-from-bottom-4 duration-700">
-          Planeje sua próxima aventura
-        </h2>
-        <p className="text-lg text-muted-foreground max-w-2xl mx-auto animate-in fade-in slide-in-from-bottom-5 duration-700 delay-100">
-          Selecione a data e o local perfeito para sua experiência inesquecível
-        </p>
+
+      <section className="w-full max-w-7xl mx-auto px-4 py-16 text-center flex flex-col items-center">
+        <div className="inline-block rounded-3xl px-12 py-16 bg-white shadow-2xl max-w-5xl w-full">
+          <h2 className="text-5xl md:text-6xl font-bold mb-6 text-blue-900 animate-in fade-in slide-in-from-bottom-4 duration-700">
+            Planeje sua próxima aventura
+          </h2>
+          <p className="text-xl text-blue-800 animate-in fade-in slide-in-from-bottom-5 duration-700 delay-100">
+            Selecione a data e o local perfeito para sua experiência inesquecível
+          </p>
+        </div>
       </section>
 
-      {/* Search Section */}
-      <SearchSection />
+      {/* Search Section com layout horizontal */}
+      <div className="w-full max-w-7xl mx-auto px-4 flex flex-col md:flex-row gap-8 items-start justify-center min-h-[500px]">
+        <SearchSection />
+      </div>
+
 
       {/* Footer */}
-      <footer className="w-full mt-16 py-8 border-t bg-card">
+      <footer className="w-full mt-16 py-8 border-t bg-card bg-opacity-70 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto px-4 text-center text-sm text-muted-foreground">
-          <p>© 2025 Dines de Jumps. Todos os direitos reservados.</p>
+          <p>© 2025 TemporALL. Todos os direitos reservados.</p>
         </div>
       </footer>
 
       {/* ChatBot */}
       <ChatBot />
     </div>
+  </div>
   );
 };
 

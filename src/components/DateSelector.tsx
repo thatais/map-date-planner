@@ -17,10 +17,12 @@ interface DateSelectorProps {
 
 export default function DateSelector({ onDateSelect }: DateSelectorProps) {
   const [date, setDate] = useState<Date>();
+  const [month, setMonth] = useState<Date>(date ?? new Date());
 
   const handleSelect = (selectedDate: Date | undefined) => {
     setDate(selectedDate);
     onDateSelect(selectedDate);
+    if (selectedDate) setMonth(selectedDate);
   };
 
   return (
@@ -30,7 +32,7 @@ export default function DateSelector({ onDateSelect }: DateSelectorProps) {
           variant="outline"
           className={cn(
             "w-full justify-start text-left font-normal h-12 border-2 hover:border-primary transition-all",
-            !date && "text-muted-foreground"
+            !date ? "text-muted-foreground" : "text-black"
           )}
         >
           <CalendarIcon className="mr-2 h-4 w-4" />
@@ -42,9 +44,13 @@ export default function DateSelector({ onDateSelect }: DateSelectorProps) {
           mode="single"
           selected={date}
           onSelect={handleSelect}
+          month={month}
+          onMonthChange={setMonth}
           initialFocus
           className="pointer-events-auto"
           locale={ptBR}
+          fromDate={new Date()}
+          toDate={new Date(new Date().setFullYear(new Date().getFullYear() + 10))}
         />
       </PopoverContent>
     </Popover>

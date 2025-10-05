@@ -2,27 +2,34 @@ import { useState } from 'react';
 import { MapPin } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { GoogleMap, useJsApiLoader, Marker } from '@react-google-maps/api';
+
+const GOOGLE_MAPS_KEY = "AIzaSyDz7EaS7DBifoUovlVZ-px98yln32ZXZdE";
 
 interface LocationMapProps {
   onLocationSelect: (lat: number, lng: number) => void;
+  selectedLocation?: { lat: number; lng: number } | null;
 }
 
-export default function LocationMap({ onLocationSelect }: LocationMapProps) {
-  const [selectedLocation, setSelectedLocation] = useState<{ lat: number; lng: number } | null>(null);
+const LIBRARIES: ('places' | 'drawing' | 'geometry' | 'visualization')[] = ['places'];
 
-  const handleMapClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    
-    // Convert click coordinates to approximate lat/lng
-    // This is a simple simulation - in production you'd use a real map library
-    const lat = -23.5505 + (y - rect.height / 2) / 1000;
-    const lng = -46.6333 + (x - rect.width / 2) / 1000;
-    
-    setSelectedLocation({ lat, lng });
-    onLocationSelect(lat, lng);
+export default function LocationMap({ onLocationSelect, selectedLocation }: LocationMapProps) {
+  const [internalLocation, setInternalLocation] = useState<{ lat: number; lng: number } | null>(null);
+  // Use prop if provided, otherwise use internal state
+  const location = selectedLocation ?? internalLocation;
+
+  const containerStyle = {
+    width: '100%',
+    height: '100%'
   };
+
+  const { isLoaded } = useJsApiLoader({
+    googleMapsApiKey: GOOGLE_MAPS_KEY || "AIzaSyDz7EaS7DBifoUovlVZ-px98yln32ZXZdEI",
+    libraries: LIBRARIES,
+  });
+
+  // A posição inicial é importante, use a última localização selecionada ou um default
+  const center = location || { lat: -23.5505, lng: -46.6333 };
 
   const handleCurrentLocation = () => {
     if (navigator.geolocation) {
@@ -30,7 +37,7 @@ export default function LocationMap({ onLocationSelect }: LocationMapProps) {
         (position) => {
           const lat = position.coords.latitude;
           const lng = position.coords.longitude;
-          setSelectedLocation({ lat, lng });
+          setInternalLocation({ lat, lng });
           onLocationSelect(lat, lng);
         },
         (error) => {
@@ -41,57 +48,42 @@ export default function LocationMap({ onLocationSelect }: LocationMapProps) {
   };
 
   return (
-    <Card className="w-full h-full min-h-[400px] rounded-xl overflow-hidden relative bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-950 dark:to-purple-950">
-      <div 
-        className="w-full h-full cursor-crosshair relative"
-        onClick={handleMapClick}
-        style={{
-          backgroundImage: `
-            linear-gradient(rgba(59, 130, 246, 0.1) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(59, 130, 246, 0.1) 1px, transparent 1px)
-          `,
-          backgroundSize: '20px 20px'
-        }}
-      >
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-          <div className="text-center p-6 bg-card/80 backdrop-blur-sm rounded-xl">
-            <MapPin className="w-12 h-12 mx-auto mb-3 text-primary" />
-            <p className="text-sm font-medium mb-1">Mapa Interativo</p>
-            <p className="text-xs text-muted-foreground">Clique para selecionar uma localização</p>
-          </div>
-        </div>
-
-        {selectedLocation && (
-          <div 
-            className="absolute w-8 h-8 -ml-4 -mt-8"
-            style={{
-              left: '50%',
-              top: '50%',
-              transform: 'translate(-50%, -50%)'
+    <Card className="w-full h-full min-h-[400px] rounded-xl overflow-hidden relative">
+      {isLoaded ? (
+        <div className="w-full h-[400px] relative">
+          <GoogleMap
+            mapContainerStyle={containerStyle}
+            center={center}
+            zoom={14}
+            onClick={(e) => {
+              const newLat = e.latLng.lat();
+              const newLng = e.latLng.lng();
+              setInternalLocation({ lat: newLat, lng: newLng });
+              onLocationSelect(newLat, newLng);
             }}
           >
-            <MapPin className="w-8 h-8 text-primary drop-shadow-lg animate-in zoom-in" />
+            {location && <Marker position={location} />}
+          </GoogleMap>
+          <div className="absolute bottom-4 left-4 right-4 flex gap-2 pointer-events-auto z-10">
+            <Button
+              onClick={handleCurrentLocation}
+              variant="secondary"
+              size="sm"
+              className="shadow-lg"
+            >
+              <MapPin className="w-4 h-4 mr-2" />
+              Usar minha localização
+            </Button>
+            {location && (
+              <div className="flex-1 bg-card/90 backdrop-blur-sm px-3 py-2 rounded-lg text-xs font-mono flex items-center justify-center shadow-lg">
+                {location.lat.toFixed(4)}, {location.lng.toFixed(4)}
+              </div>
+            )}
           </div>
-        )}
-
-        <div className="absolute bottom-4 left-4 right-4 flex gap-2 pointer-events-auto">
-          <Button
-            onClick={handleCurrentLocation}
-            variant="secondary"
-            size="sm"
-            className="shadow-lg"
-          >
-            <MapPin className="w-4 h-4 mr-2" />
-            Usar minha localização
-          </Button>
-          
-          {selectedLocation && (
-            <div className="flex-1 bg-card/90 backdrop-blur-sm px-3 py-2 rounded-lg text-xs font-mono flex items-center justify-center shadow-lg">
-              {selectedLocation.lat.toFixed(4)}, {selectedLocation.lng.toFixed(4)}
-            </div>
-          )}
         </div>
-      </div>
+      ) : (
+        <div className="flex items-center justify-center h-full">Carregando Mapa...</div>
+      )}
     </Card>
   );
 }
